@@ -1,6 +1,8 @@
 [submodule "talent_forge"]
 	path = talent_forge
 	url = https://github.com/gabriel-dears/talent_forge.git
+	branch = main
 [submodule "talent_forge_ai_matcher"]
 	path = talent_forge_ai_matcher
 	url = https://github.com/gabriel-dears/talent_forge_ai_matcher.git
+	branch = main
