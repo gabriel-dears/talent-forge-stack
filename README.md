@@ -65,8 +65,9 @@ Be sure to adjust credentials and URLs as needed.
 ```bash
 git clone --recurse-submodules https://github.com/your-username/talent_forge_stack.git
 cd talent_forge_stack
-If you forgot --recurse-submodules:
 ```
+
+If you forgot --recurse-submodules:
 
 ```bash
 git submodule update --init --recursive
