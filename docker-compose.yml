@@ -12,7 +12,55 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB" ]
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tf-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tf-net
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    ports:
+      - "2181:2181"
+    environment:
+    - ALLOW_ANONYMOUS_LOGIN=yes  
+    healthcheck:
+      test: ["CMD", "zkServer.sh", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tf-net
+
+  kafka:
+    image: bitnami/kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,6 +79,10 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       JAVA_OPTS: ${JAVA_OPTS}
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
@@ -44,11 +96,11 @@ services:
       AI_MATCHER_URL: ${AI_MATCHER_URL}
     ports:
       - "8080:8080"
-      - "5005:5005" # <-- Expose debug port
+      - "5005:5005" # Debug port
     networks:
       - tf-net
     healthcheck:
-      test: [ "CMD", "curl", "-f", "$APP_HEALTHCHECK_URL" ]
+      test: ["CMD", "curl", "-f", "$APP_HEALTHCHECK_URL"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -61,17 +113,32 @@ services:
       context: ./talent_forge_ai_matcher
       dockerfile: Dockerfile
     depends_on:
+      app:
+        condition: service_healthy
       postgres:
         condition: service_healthy
-      app:
+      redis:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     environment:
       SPRING_API_URL: ${SPRING_API_URL}
+      SMTP_FROM: your_email@gmail.com
+      SMTP_PASSWORD: your_app_password
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8000:8000"
     networks:
       - tf-net
-
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
