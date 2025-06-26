@@ -17,9 +17,12 @@ talent_forge_stack/
 
 This project integrates two main submodules:
 
-talent_forge – Java Spring Boot backend for managing candidates, jobs, resumes, and notifications.
+| Submodule                                                                             | Description                                                                              |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`talent_forge`](https://github.com/gabriel-dears/talent_forge)                       | Spring Boot backend for managing jobs, candidates, resumes, and Kafka events             |
+| [`talent_forge_ai_matcher`](https://github.com/gabriel-dears/talent_forge_ai_matcher) | Python FastAPI service that performs AI-powered matching logic and consumes Kafka events |
 
-talent_forge_ai_matcher – Python-based microservice that performs AI-powered candidate/job matching.
+⚠️ Run git clone --recurse-submodules to pull submodules automatically.
 
 ## 🐳 Services Overview
 
@@ -111,12 +114,30 @@ AI Matcher: Uvicorn self-monitoring
 
 ✅ Modular microservice design
 
-## 🛠️ Future Enhancements
+##  💡 Core Platform Features
 
-Add service discovery or API Gateway
+✅ Job and candidate management (CRUD)
 
-Integrate external NLP APIs (e.g., AWS Comprehend)
+✅ Resume file upload with parsing
 
-Add authentication (OAuth2/JWT)
+✅ Asynchronous AI-powered matching via Kafka
 
-Connect Prometheus + Grafana for monitoring
+✅ Semantic search using sentence-transformers
+
+✅ Email/SMS notifications (via external service)
+
+✅ Observability with Spring Boot Actuator
+
+✅ Microservice modularity via Docker Compose
+
+## 🛠️ Planned Enhancements
+
+⚙️ Add service discovery or API Gateway (e.g., Spring Cloud Gateway)
+
+🤖 Integrate external NLP services (e.g., AWS Comprehend, HuggingFace)
+
+🔐 Implement full OAuth2/JWT authentication across services
+
+📈 Connect Prometheus + Grafana for live monitoring and metrics
+
+🌐 Optional frontend interface (Angular or React-based)
