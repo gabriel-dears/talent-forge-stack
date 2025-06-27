@@ -69,6 +69,21 @@ services:
     networks:
       - tf-net
 
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: talent-forge-kafka-ui
+    ports:
+      - "8081:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=talent-forge-cluster
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
+    depends_on:
+      - kafka
+    networks:
+      - tf-net
+  
+
   app:
     image: talent-forge-app
     container_name: talent-forge-app
