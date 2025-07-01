@@ -157,6 +157,41 @@ services:
       timeout: 5s
       retries: 5
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: talent-forge-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - tf-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: talent-forge-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Senha inicial do admin (altere em produção)
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - tf-net
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: talent-forge-tempo
+    ports:
+      - "4318:4318"    # HTTP OTLP endpoint
+      - "9411:9411"    # Zipkin endpoint
+    command:
+      - "-config.file=/etc/tempo/tempo.yaml"
+    volumes:
+      - ./tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+    networks:
+      - tf-net
+
 volumes:
   postgres_data:
 
