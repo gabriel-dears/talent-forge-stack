@@ -11,11 +11,11 @@ distributor:
           endpoint: 0.0.0.0:4318
 
 ingester:
-  max_block_duration: 5m
+  max_block_duration: 1m
 
 compactor:
   compaction:
-    block_retention: 1h
+    block_retention: 6h
 
 metrics_generator:
   registry:
