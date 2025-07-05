@@ -180,17 +180,18 @@ services:
       - tf-net
 
   tempo:
-    image: grafana/tempo:latest
+    image: grafana/tempo:2.7.2
     container_name: talent-forge-tempo
     ports:
-      - "4318:4318"    # HTTP OTLP endpoint
-      - "9411:9411"    # Zipkin endpoint
-    command:
-      - "-config.file=/etc/tempo/tempo.yaml"
+      - "3200:3200"    # UI queries
+      - "4317:4317"
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
     volumes:
       - ./tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - ./tempo/data:/tmp/tempo
     networks:
       - tf-net
+
 
 volumes:
   postgres_data:

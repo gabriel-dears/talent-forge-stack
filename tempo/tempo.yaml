@@ -1,27 +1,40 @@
 server:
   http_listen_port: 3200
-  log_level: info
 
 distributor:
   receivers:
-    zipkin:
-      endpoint: "0.0.0.0:9411"
     otlp:
       protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
         http:
-          endpoint: "0.0.0.0:4318"  # changed from 3200 to 4318
+          endpoint: 0.0.0.0:4318
 
 ingester:
-  trace_idle_period: 10s
-  max_block_bytes: 100000000
   max_block_duration: 5m
 
 compactor:
   compaction:
     block_retention: 1h
 
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo
+      cluster: docker-compose
+  storage:
+    path: /tmp/tempo/generator/wal
+    remote_write:
+      - url: http://prometheus:9090/api/v1/write
+        send_exemplars: true
+
 storage:
   trace:
     backend: local
+    wal:
+      path: /tmp/tempo/wal
     local:
-      path: /tmp/tempo
+      path: /tmp/tempo/blocks
+
+overrides:
+  metrics_generator_processors: [service-graphs, span-metrics]
