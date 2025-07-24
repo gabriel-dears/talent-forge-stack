@@ -133,6 +133,17 @@ Each container defines health checks:
 
 ---
 
+## 🔐 Authentication
+Talent Forge now includes JWT-based authentication using Spring Security.
+Each request to the protected endpoints must include a valid token in the Authorization header:
+
+```
+Authorization: Bearer <your_token>
+The /auth/login endpoint issues the JWT after verifying user credentials.
+```
+
+---
+
 ## 📊 Observability
 
 | Tool                  | Purpose                                   |
